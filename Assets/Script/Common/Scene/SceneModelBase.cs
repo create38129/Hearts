@@ -25,6 +25,9 @@ namespace Assets.Script.Common.Scene
         public ReadOnlyReactiveProperty<bool> IsActive => isActive.ToReadOnlyReactiveProperty();
         private readonly ReactiveProperty<bool> isActive = new ReactiveProperty<bool>(false);
 
+        /// <summary>
+        /// シーンが解放される時に通知
+        /// </summary>
         public IObservable<Unit> OnRelease => onRelease;
 		private readonly Subject<Unit> onRelease = new Subject<Unit>();
 
@@ -65,7 +68,7 @@ namespace Assets.Script.Common.Scene
         /// <summary>
         /// シーン破棄
         /// </summary>
-        public virtual UniTask OnSceneRelease()
+        public virtual UniTask SceneRelease()
         {
             onRelease.OnNext(Unit.Default);
 

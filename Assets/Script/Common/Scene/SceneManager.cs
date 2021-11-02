@@ -65,7 +65,7 @@ namespace Assets.Script.Common.Scene
             }
             else
             {
-                await currentScene.Value.OnSceneRelease();
+                await currentScene.Value.SceneRelease();
             }
 
             currentScene.Value = model;
@@ -87,7 +87,7 @@ namespace Assets.Script.Common.Scene
 
             await FadeManager.Instance.FadeIn();
 
-            await currentScene.Value.OnSceneRelease();
+            await currentScene.Value.SceneRelease();
 
             currentScene.Value = sceneHistory.Last();
             sceneHistory.Remove(currentScene.Value);
