@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
-
+using Cysharp.Threading.Tasks;
 
 namespace Assets.Script.Common.Scene
 {
@@ -30,28 +30,36 @@ namespace Assets.Script.Common.Scene
             sceneData = data;
         }
 
-
+        /// <summary>
+        /// 初期化処理
+        /// </summary>
+        public virtual void OnInitialize()
+        {
+            // ボタン登録とか
+        }
 
         /// <summary>
         /// 暗転中準備
         /// </summary>
-        public virtual void OnAppearPrep()
+        public virtual UniTask OnAppearPrep()
         {
             // ロードとか
+
+            return new UniTask();
         }
 
         /// <summary>
-        /// 暗転解除
+        /// 暗転解除後
         /// </summary>
         public virtual void OnViewAppear()
         {
-
+            // 画面演出
         }
 
         /// <summary>
         /// 暗転開始
         /// </summary>
-        public virtual void OnHide()
+        public virtual void OnHidePrep()
         {
         }
 
@@ -59,8 +67,10 @@ namespace Assets.Script.Common.Scene
         /// <summary>
         /// シーン破棄
         /// </summary>
-        public virtual void OnSceneRelease()
+        public virtual UniTask OnSceneRelease()
         {
+            //リソース解放等
+            return new UniTask();
         }
 
 

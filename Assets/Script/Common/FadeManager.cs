@@ -1,7 +1,9 @@
 using Assets.Script.Common.Component;
+using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,51 +21,60 @@ namespace Assets.Script.Common
         [SerializeField]
         private float duration = 0.5f;
 
+        private readonly ReactiveProperty<bool> isRaycast = new ReactiveProperty<bool>();
+        private readonly ReactiveProperty<float> alpha = new ReactiveProperty<float>();
 
-        public IObservable<Unit> OnFadeIn => fadeInSubject;
-        private Subject<Unit> fadeInSubject = new Subject<Unit>();
-
-        public IObservable<Unit> OnFadeOut => fadeOutSubject;
-        private Subject<Unit> fadeOutSubject = new Subject<Unit>();
 
         private IDisposable disposable = null;
 
-        public void FadeIn(Action action = null)
+        private void Start()
         {
-            fadeImage.raycastTarget = true;
-            
+            isRaycast.Subscribe(raycast => fadeImage.raycastTarget = raycast).AddTo(this);
+            alpha.Subscribe(fadeImage.SetAlpha).AddTo(this);
+        }
+
+
+        public async UniTask FadeIn()
+        {
+            isRaycast.Value = true;
+            bool isWait = true;
             if (disposable != null) disposable.Dispose();
 
             var subject = new Subject<float>();
             subject.Subscribe(
                 ratio => {
-                    fadeImage.SetAlpha(ratio);
+                    alpha.Value = ratio;
                 },
                 ()=> {
-                    fadeInSubject.OnNext(Unit.Default);
-                    if(action != null) action();
+                    isWait = false;
                 })
                 .AddTo(this);
             disposable = Extensions.Tween(subject, duration);
+
+            await UniTask.WaitUntil(() => isWait);
         }
 
-        public void FadeOut(Action action = null)
+        public async UniTask FadeOut()
         {
             if (disposable != null) disposable.Dispose();
 
+            bool isWait = true;
             var subject = new Subject<float>();
             subject.Subscribe(
                 ratio => {
-                    fadeImage.SetAlpha(1.0f - ratio);
+                    alpha.Value = 1.0f - ratio;
                 },
                 () =>
                 {
-                    fadeImage.raycastTarget = false;
-                    fadeOutSubject.OnNext(Unit.Default);
-                    if (action != null) action();
+                    isRaycast.Value = false;
+                    isWait = false;
                 })
                 .AddTo(this);
             disposable = Extensions.Tween(subject, duration);
+            while (isWait)
+            {
+                await UniTask.Yield();
+            }
         }
     }
 
