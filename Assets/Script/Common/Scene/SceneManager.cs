@@ -19,54 +19,59 @@ namespace Assets.Script.Common.Scene
         /// <summary>
         /// 現在のシーン
         /// </summary>
-        public ReadOnlyReactiveProperty<SceneBase> CurrentScene => currentScene.ToReadOnlyReactiveProperty();
-        private readonly ReactiveProperty<SceneBase> currentScene = new ReactiveProperty<SceneBase>(null);
+        public ReadOnlyReactiveProperty<SceneModelBase> CurrentScene => currentScene.ToReadOnlyReactiveProperty();
+        private readonly ReactiveProperty<SceneModelBase> currentScene = new ReactiveProperty<SceneModelBase>(null);
 
         private const string ScenePrefabRoot = "Prefabs/Scene/";
 
-        private readonly List<SceneBase> sceneHistory = new List<SceneBase>();
+        private readonly List<SceneModelBase> sceneHistory = new List<SceneModelBase>();
 
         public async void Start()
         {
             //最初のシーン呼び出し
-            SceneDataBase startSceneData = new TitleSceneData();
-            string path = ScenePrefabRoot + startSceneData.ScenePrefab;
+            SceneModelBase model = new TitleSceneModel();
+            string path = ScenePrefabRoot + model.ScenePrefab;
             var obj = Resources.Load(path) as GameObject;
-            currentScene.Value = Instantiate(obj, sceneParent).GetComponent<SceneBase>();
-            await currentScene.Value.OnAppearPrep();
+            currentScene.Value = model;
+            ScenePresenterBase presenter = Instantiate(obj, sceneParent).GetComponent<ScenePresenterBase>();
+            presenter.Initialize(model);
+            presenter.Register();
+            currentScene.Value.SetActive(true);
+            await currentScene.Value.AppearPrep();
 
             await FadeManager.Instance.FadeOut();
-            currentScene.Value.OnViewAppear();
+            currentScene.Value.ViewAppear();
         }
 
 
-        public async void NextScene(SceneDataBase sceneData, bool canBack = true)
+        public async void NextScene(SceneModelBase model, bool canBack = true)
         {
-            currentScene.Value.OnHidePrep();
+            currentScene.Value.HidePrep();
             await FadeManager.Instance.FadeIn();
 
-            string path = ScenePrefabRoot + sceneData.ScenePrefab;
+            string path = ScenePrefabRoot + model.ScenePrefab;
             GameObject obj = await Resources.LoadAsync(path) as GameObject;
-            var scene = Instantiate(obj, sceneParent).GetComponent<SceneBase>();
-            scene.gameObject.SetActive(true);
-            scene.OnInitialize();
-            await scene.OnAppearPrep();
+            ScenePresenterBase presenter = Instantiate(obj, sceneParent).GetComponent<ScenePresenterBase>();
+            presenter.Initialize(model);
+            presenter.Register();
+            model.SetActive(true);
+            model.Initialize();
+            await model.AppearPrep();
 
             if (canBack)
             {
                 sceneHistory.Add(currentScene.Value);
-                currentScene.Value.gameObject.SetActive(false);
+                currentScene.Value.SetActive(false);
             }
             else
             {
                 await currentScene.Value.OnSceneRelease();
-                Destroy(currentScene.Value.gameObject);
             }
 
-            currentScene.Value = scene;
+            currentScene.Value = model;
             await FadeManager.Instance.FadeOut();
 
-            currentScene.Value.OnViewAppear();
+            currentScene.Value.ViewAppear();
         }
 
 
@@ -78,21 +83,20 @@ namespace Assets.Script.Common.Scene
                 return;
             }
 
-            currentScene.Value.OnHidePrep();
+            currentScene.Value.HidePrep();
 
             await FadeManager.Instance.FadeIn();
 
             await currentScene.Value.OnSceneRelease();
-            Destroy(currentScene.Value.gameObject);
 
             currentScene.Value = sceneHistory.Last();
             sceneHistory.Remove(currentScene.Value);
-            currentScene.Value.gameObject.SetActive(true);
-            await currentScene.Value.OnAppearPrep();
+            currentScene.Value.SetActive(true);
+            await currentScene.Value.AppearPrep();
 
             await FadeManager.Instance.FadeOut();
 
-            currentScene.Value.OnViewAppear();
+            currentScene.Value.ViewAppear();
         }
     }
 }

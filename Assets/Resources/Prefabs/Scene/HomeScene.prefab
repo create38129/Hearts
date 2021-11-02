@@ -488,7 +488,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7458003233343727117}
-  - component: {fileID: 786682698665099939}
+  - component: {fileID: 5959042557339032854}
   m_Layer: 0
   m_Name: HomeScene
   m_TagString: Untagged
@@ -514,7 +514,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &786682698665099939
+--- !u!114 &5959042557339032854
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -523,7 +523,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7458003233343727118}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ed821a88008330f409b84fd669b51239, type: 3}
+  m_Script: {fileID: 11500000, guid: e53ce8d2fe67c2341b0326698e33cbc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   buttoncomp: {fileID: 7458003233135624269}

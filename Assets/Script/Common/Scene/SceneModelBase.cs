@@ -3,45 +3,43 @@ using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
 using Cysharp.Threading.Tasks;
+using System;
 
 namespace Assets.Script.Common.Scene
 {
     /// <summary>
     /// シーンベース
     /// </summary>
-    public abstract class SceneBase : MonoBehaviour
+    public abstract class SceneModelBase
     {
         /// <summary>
         /// シーン名
         /// </summary>
         public abstract string SceneName { get; }
 
-        /// <summary>
-        /// シーンに必要なデータ
-        /// </summary>
-        protected SceneDataBase sceneData;
+        public abstract string ScenePrefab { get; }
 
         /// <summary>
-        /// シーンデータの設定
+        /// シーンがアクティブ常態か
         /// </summary>
-        /// <param name="data"></param>
-        public void SetSceneData(SceneDataBase data)
-        {
-            sceneData = data;
-        }
+        public ReadOnlyReactiveProperty<bool> IsActive => isActive.ToReadOnlyReactiveProperty();
+        private readonly ReactiveProperty<bool> isActive = new ReactiveProperty<bool>(false);
+
+        public IObservable<Unit> OnRelease => onRelease;
+		private readonly Subject<Unit> onRelease = new Subject<Unit>();
+
 
         /// <summary>
         /// 初期化処理
         /// </summary>
-        public virtual void OnInitialize()
+        public virtual void Initialize()
         {
-            // ボタン登録とか
         }
 
         /// <summary>
         /// 暗転中準備
         /// </summary>
-        public virtual UniTask OnAppearPrep()
+        public virtual UniTask AppearPrep()
         {
             // ロードとか
 
@@ -51,7 +49,7 @@ namespace Assets.Script.Common.Scene
         /// <summary>
         /// 暗転解除後
         /// </summary>
-        public virtual void OnViewAppear()
+        public virtual void ViewAppear()
         {
             // 画面演出
         }
@@ -59,7 +57,7 @@ namespace Assets.Script.Common.Scene
         /// <summary>
         /// 暗転開始
         /// </summary>
-        public virtual void OnHidePrep()
+        public virtual void HidePrep()
         {
         }
 
@@ -69,10 +67,15 @@ namespace Assets.Script.Common.Scene
         /// </summary>
         public virtual UniTask OnSceneRelease()
         {
+            onRelease.OnNext(Unit.Default);
+
             //リソース解放等
             return new UniTask();
         }
 
-
+        public void SetActive(bool isActive)
+        {
+            this.isActive.Value = isActive;
+        }
     }
 }
