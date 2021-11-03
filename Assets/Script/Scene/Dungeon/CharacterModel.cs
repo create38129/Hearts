@@ -29,12 +29,8 @@ namespace Assets.Script.Scene.Dungeon
 
         public void Register()
         {
-            //SystemManager.Instance.Hid.LStickHorizontalAxis.Subscribe(axis => movingPos.x += axis).AddTo(disposables);
-            //SystemManager.Instance.Hid.LStickVerticalAxis.Subscribe(axis => movingPos.y += axis).AddTo(disposables);
-
             SystemManager.Instance.Hid.Move.Subscribe(move => {
                 movingPos = move;
-                Debug.LogError(move);
             }).AddTo(disposables);
         }
 

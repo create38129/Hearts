@@ -25,12 +25,13 @@ namespace Assets.Script.Hid
         public IObservable<float> RStickVerticalAxis => rStickVerticalAxis.ToReadOnlyReactiveProperty();
         private readonly Subject<float> rStickVerticalAxis = new Subject<float>();
 
-        public IObservable<Vector2> Move => move.ToReadOnlyReactiveProperty();
+        public IObservable<Vector2> Move => move;
         private readonly Subject<Vector2> move = new Subject<Vector2>();
+
 
         public void OnLStickHorizontalAxis(float axis)
         {
-            if(!Mathf.Approximately(axis, 0f)) lStickHorizontalAxis.OnNext(axis);
+            if (!Mathf.Approximately(axis, 0f)) lStickHorizontalAxis.OnNext(axis);
         }
 
         public void OnLStickVerticalAxis(float axis)
