@@ -51,7 +51,7 @@ namespace Assets.Script.Common
                 .AddTo(this);
             disposable = Extensions.Tween(subject, duration);
 
-            await UniTask.WaitUntil(() => isWait);
+            await UniTask.WaitWhile(() => isWait);
         }
 
         public async UniTask FadeOut()
@@ -71,10 +71,7 @@ namespace Assets.Script.Common
                 })
                 .AddTo(this);
             disposable = Extensions.Tween(subject, duration);
-            while (isWait)
-            {
-                await UniTask.Yield();
-            }
+            await UniTask.WaitWhile(() => isWait);
         }
     }
 
