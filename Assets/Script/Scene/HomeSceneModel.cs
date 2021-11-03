@@ -14,7 +14,7 @@ namespace Assets.Script.Scene
 
         public void NextScene()
         {
-            SceneManager.Instance.BackScene();
+            SceneManager.Instance.NextScene(new Dungeon.DungeonSceneModel());
         }
     }
 }
